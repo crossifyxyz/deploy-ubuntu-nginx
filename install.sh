@@ -1,12 +1,14 @@
 #!/bin/bash
 
+# Load environment variables from .env file
+export $(grep -v '^#' .env | xargs)
+
 # Update the system
 echo "Updating the System"
 sudo apt update
 
 # Install NVM if not present
-if ! command -v nvm &> /dev/null
-then
+if ! [ -d "${HOME}/.nvm/.git" ]; then
     echo "NVM not found! Installing..."
     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
     source $HOME/.bashrc
@@ -15,8 +17,7 @@ else
 fi
 
 # Install NODE if not present
-if ! command -v node &> /dev/null
-then
+if ! command -v node &>/dev/null; then
     echo "NODE not found! Installing..."
     nvm install --lts
 else
@@ -24,12 +25,11 @@ else
 fi
 
 # Install Docker if not present
-if ! command -v docker &> /dev/null
-then
+if ! command -v docker &>/dev/null; then
     echo "Docker not found! Installing..."
     sudo apt install -y apt-transport-https ca-certificates curl software-properties-common
     curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
-    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list >/dev/null
     sudo apt update
     apt-cache policy docker-ce
     sudo apt install docker-ce
@@ -43,8 +43,7 @@ else
 fi
 
 # Install Nginx if not present
-if ! command -v nginx &> /dev/null
-then
+if [[ "$TEST_MODE" != "true" ]] && ! command -v nginx &>/dev/null; then
     echo "Nginx not found! Installing..."
     sudo apt install -y nginx
 else
@@ -52,8 +51,7 @@ else
 fi
 
 # Install Certbot if not present
-if ! command -v certbot &> /dev/null
-then
+if [[ "$TEST_MODE" != "true" ]] && ! command -v certbot &>/dev/null; then
     echo "Certbot not found! Installing..."
     sudo apt install snapd
     sudo snap install --classic certbot
@@ -63,8 +61,7 @@ else
 fi
 
 # Install AWS CLI if not present
-if ! command -v aws &> /dev/null
-then
+if ! command -v aws &>/dev/null; then
     echo "AWS CLI not found! Installing..."
     curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
     unzip awscliv2.zip
@@ -74,8 +71,7 @@ else
 fi
 
 # Install PM2 if not present
-if ! command -v pm2 &> /dev/null
-then
+if ! command -v pm2 &>/dev/null; then
     echo "PM2 not found! Installing..."
     sudo npm install -g pm2
 else
