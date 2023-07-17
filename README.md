@@ -12,7 +12,7 @@ This project provides scripts for setting up and updating a server environment u
 - PM2
 - AWS ECR repository with a Docker image
 
-## Start
+## Run
 
 1. Clone this repository to your server.
 
@@ -23,11 +23,11 @@ cd project-directory
 
 4. Create a `.env.docker` file and populate it with the environment variables specific to the Docker container. You can use the provided `.env.docker.example` as a template.
 
-5. Make the start script executable:
-chmod +x start.sh
+5. Make the run script executable:
+chmod +x run.sh
 
-6. Run the start script:
-./start.sh
+6. Run the run script:
+./run.sh
 
 ## Updating
 

@@ -51,7 +51,7 @@ if pm2 describe $PM2_PROCESS_NAME >/dev/null; then
     echo "PM2 process is already running"
 else
     echo "PM2 process not found! Starting..."
-    pm2 start "docker run -d -p $DEPLOY_PORT:80 --env-file $(pwd)/.env.docker $ECR_URI" --name $PM2_PROCESS_NAME
+    pm2 start "docker run -d -p $DEPLOY_PORT:8080 --env-file $(pwd)/.env.docker $ECR_URI" --name $PM2_PROCESS_NAME
 fi
 
 # Run pm2 consist if not in test mode
