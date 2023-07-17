@@ -3,6 +3,15 @@
 # Load environment variables from .env file
 export $(grep -v '^#' .env | xargs)
 
+# Function to run a script
+run_script() {
+    script=$1
+
+    echo "Running $script..."
+    bash $script
+    echo "$script completed."
+}
+
 # Check if AWS credentials are already configured
 if ! aws configure get aws_access_key_id &>/dev/null && ! aws configure get aws_secret_access_key &>/dev/null; then
     # AWS credentials not configured, run aws configure
@@ -12,8 +21,8 @@ else
     echo "AWS credentials are already configured"
 
     # Prompt to configure again
-    read -p "Do you want to configure AWS credentials again? (yes/no): " configure_again
-    if [[ $configure_again == "yes" ]]; then
+    read -p "Do you want to configure AWS credentials again? (y/n): " configure_again
+    if [[ $configure_again == "y" ]]; then
         # Run aws configure
         aws configure
     fi
@@ -26,6 +35,7 @@ aws ecr get-login-password | docker login --username AWS --password-stdin $ECR_U
 docker pull $ECR_URI
 
 # Run the Certbot dry run and actual run if not in test mode
+certbot_failed=false
 if [[ "$TEST_MODE" != "true" ]]; then
     # Certbot dry run and actual run if successful
     for domain in $DOMAINS; do
@@ -39,6 +49,7 @@ if [[ "$TEST_MODE" != "true" ]]; then
                 sudo certbot --nginx -d $domain --email $EMAIL --agree-tos --no-eff-email
             else
                 echo "Dry run failed for $domain!"
+                certbot_failed=true
             fi
         fi
     done
@@ -46,33 +57,35 @@ else
     echo "Skipping Certbot dry run and actual run in test mode"
 fi
 
-# Run the Docker container using PM2 if not already running
-if pm2 describe $PM2_PROCESS_NAME >/dev/null; then
-    echo "PM2 process is already running"
+# Run the Docker container if not already running
+if docker ps --filter "name=$DOCKER_PROCESS_NAME" --format '{{.Names}}' | grep -q "$DOCKER_PROCESS_NAME"; then
+    echo "Docker container is already running"
 else
-    echo "PM2 process not found! Starting..."
-    pm2 start "docker run -d -p $DEPLOY_PORT:8080 --env-file $(pwd)/.env.docker $ECR_URI" --name $PM2_PROCESS_NAME
+    echo "Docker container not found! Starting..."
+    docker run -d -p $DEPLOY_PORT:$DEPLOY_PORT --env-file $(pwd)/.env.docker --name $DOCKER_PROCESS_NAME $ECR_URI
 fi
 
-# Run pm2 consist if not in test mode
+# Run Docker consist if not in test mode
 if [[ "$TEST_MODE" == "false" ]]; then
-    # Make PM2 run on startup and run all services in PM2 on startup
-    pm2 startup
-    pm2 save
+    # Configure Docker to start the container on system startup
+    echo "Configuring Docker container to run on startup..."
+    docker update --restart=unless-stopped $DOCKER_PROCESS_NAME
 else
-    echo "Skipping pm2 consist in test mode"
+    echo "Skipping Docker container to run on startup in test mode"
 fi
 
-# Add a cron job to auto renew the Certbot certificate if not already added
-CRON_JOB="0 12 * * * /usr/bin/certbot renew --quiet"
-if [[ "$TEST_MODE" != "true" ]]; then
+if [[ "$certbot_failed" != "true" ]]; then
+    # Run nginx.sh
+    run_script "nginx.sh"
+    # Add a cron job to auto renew the Certbot certificate if not already added
+    CRON_JOB="0 12 * * * /usr/bin/certbot renew --quiet"
     if ! crontab -l | grep -q "$CRON_JOB"; then
         echo "$CRON_JOB" | sudo tee -a /var/spool/cron/crontabs/root
     else
         echo "Cron job already added"
     fi
 else
-    echo "Skipping cron job in test mode"
+    echo "Skipping cron job in test mode or when Certbot run failed"
 fi
 
 echo "Setup finalized!"

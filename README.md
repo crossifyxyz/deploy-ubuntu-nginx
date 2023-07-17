@@ -38,11 +38,7 @@ chmod +x run.sh
 
 ## Usage
 
-- The server environment can be started, stopped, and managed using PM2:
-pm2 start|stop|restart|delete|status process-name
-
-- The Docker container logs can be viewed using PM2:
-pm2 logs process-name
+- The server environment can be started, stopped, and managed using ./run.sh
 
 ## License
 

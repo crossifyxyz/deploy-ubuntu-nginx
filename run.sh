@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Load environment variables from .env file
+export $(grep -v '^#' .env | xargs)
+
 # Make install.sh and setup.sh executable
 chmod +x install.sh
 chmod +x setup.sh
@@ -22,15 +25,20 @@ echo "2. Update"
 echo "3. Install"
 echo "4. Setup"
 echo "5. Nginx"
+echo "6. Run Docker"
+echo "7. Restart Docker"
+echo "8. View Docker logs"
+echo "9. Kill all Docker"
+echo "10. Disable Docker on startup"
+echo "11. Cancel Certbot cron job"
 
-read -p "Enter your choice (1-5): " choice
+read -p "Enter your choice (1-11): " choice
 
 # Execute the selected option
 case $choice in
     1)
         run_script "install.sh"
         run_script "setup.sh"
-        run_script "nginx.sh"
         ;;
     2)
         run_script "update.sh"
@@ -44,6 +52,24 @@ case $choice in
     5)
         run_script "nginx.sh"
         ;;
+    6)
+        docker run -d -p $DEPLOY_PORT:$DEPLOY_PORT --env-file $(pwd)/.env.docker --name $DOCKER_PROCESS_NAME $ECR_URI
+        ;;
+    7)
+        docker restart $DOCKER_PROCESS_NAME
+        ;;
+    8)
+        docker logs $DOCKER_PROCESS_NAME
+        ;;
+    9)
+        docker rm -f $(docker ps -aq)
+        ;;
+    10)
+        docker update --restart=no $DOCKER_PROCESS_NAME
+        ;;
+    11)
+        sudo crontab -l | grep -v "/usr/bin/certbot renew --quiet" | sudo crontab -
+        ;;
     *)
         echo "Invalid choice. Exiting..."
         exit 1
@@ -51,5 +77,4 @@ case $choice in
 esac
 
 # Finish the terminal prompts
-echo "Installation and setup completed. Press any key to exit."
-read -n 1 -s -r -p ""
+echo "Run completed!"

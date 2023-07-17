@@ -30,7 +30,7 @@ if [[ "$TEST_MODE" != "true" ]]; then
     sed -i "s/proxy_pass_placeholder/http:\/\/localhost:$DEPLOY_PORT/g" def-server-conf
 
     # Move the updated configuration file to the Nginx sites-available directory
-    sudo mv def-server-conf $DEFAULT_SERVER_CONF
+    sudo cp def-server-conf $DEFAULT_SERVER_CONF
 
     # Restart Nginx to apply the changes
     sudo systemctl restart nginx
