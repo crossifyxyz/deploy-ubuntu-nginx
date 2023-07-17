@@ -8,14 +8,23 @@ chmod +x install.sh
 chmod +x setup.sh
 chmod +x update.sh
 chmod +x nginx.sh
+chmod +x swap.sh
 
 # Function to run a script
 run_script() {
     script=$1
-    
+
     echo "Running $script..."
     bash $script
     echo "$script completed."
+}
+
+# Function to configure swap space
+configure_swap_space() {
+    read -p "Do you want to configure swap space? (y/n): " configure_swap
+    if [[ $configure_swap == "y" ]]; then
+        run_script "swap.sh"
+    fi
 }
 
 # Prompt for user input
@@ -31,12 +40,14 @@ echo "8. View Docker logs"
 echo "9. Kill all Docker"
 echo "10. Disable Docker on startup"
 echo "11. Cancel Certbot cron job"
+echo "12. Configure Swap Space"
 
-read -p "Enter your choice (1-11): " choice
+read -p "Enter your choice (1-12): " choice
 
 # Execute the selected option
 case $choice in
     1)
+        configure_swap_space
         run_script "install.sh"
         run_script "setup.sh"
         ;;
@@ -69,6 +80,9 @@ case $choice in
         ;;
     11)
         sudo crontab -l | grep -v "/usr/bin/certbot renew --quiet" | sudo crontab -
+        ;;
+    12)
+        configure_swap_space
         ;;
     *)
         echo "Invalid choice. Exiting..."
