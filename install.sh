@@ -33,11 +33,7 @@ if ! command -v docker &>/dev/null; then
     sudo apt update
     apt-cache policy docker-ce
     sudo apt install docker-ce
-    sudo systemctl status docker
     sudo usermod -aG docker ${USER}
-    su - ${USER}
-    echo "Printing User Groups"
-    groups
 else
     echo "Docker is already installed"
 fi
