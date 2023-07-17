@@ -43,7 +43,7 @@ if [[ "$TEST_MODE" != "true" ]]; then
             echo "Certbot certificate already exists for $domain"
         else
             echo "Certbot certificate not found for $domain! Running dry run..."
-            sudo certbot certonly --nginx --dry-run -d $domain --email $EMAIL --agree-tos --no-eff-email
+            sudo certbot certonly --dry-run -d $domain --email $EMAIL --agree-tos --no-eff-email
             if [ $? -eq 0 ]; then
                 echo "Dry run successful for $domain! Running certbot..."
                 sudo certbot --nginx -d $domain --email $EMAIL --agree-tos --no-eff-email
