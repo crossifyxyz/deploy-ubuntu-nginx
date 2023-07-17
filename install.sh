@@ -49,7 +49,10 @@ fi
 # Install Certbot if not present
 if [[ "$TEST_MODE" != "true" ]] && ! command -v certbot &>/dev/null; then
     echo "Certbot not found! Installing..."
-    sudo apt install snapd
+    if ! command -v snapd &>/dev/null; then
+        echo "SNAP not found! Installing..."
+        sudo apt install snapd
+    fi
     sudo snap install --classic certbot
     sudo ln -s /snap/bin/certbot /usr/bin/certbot
 else
@@ -60,6 +63,10 @@ fi
 if ! command -v aws &>/dev/null; then
     echo "AWS CLI not found! Installing..."
     curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+    if ! command -v unzip &>/dev/null; then
+        echo "Unzip not found! Installing..."
+        sudo apt install unzip
+    fi
     unzip awscliv2.zip
     sudo ./aws/install
 else
