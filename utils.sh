@@ -23,3 +23,17 @@ add_cron_job() {
         echo "Cron job already exists: $cron_job"
     fi
 }
+
+# Function to remove a cron job
+remove_cron_job() {
+    cron_job=$1
+    if crontab -l | grep -q "$cron_job"; then
+        sudo crontab -l | grep -v "$cron_job" | sudo crontab -
+        echo "Cron job removed: $cron_job"
+    else
+        echo "Cron job does not exist: $cron_job"
+    fi
+}
+
+CRON_JOB_CERTBOT="0 12 * * * /usr/bin/certbot renew --quiet --non-interactive"
+CRON_JOB_UPDATE="*/30 * * * * $CURRENT_DIR/check_update.sh $CURRENT_DIR"

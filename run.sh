@@ -27,7 +27,7 @@ source ./utils.sh
 chmod +x install.sh
 chmod +x setup.sh
 chmod +x update.sh
-chmod +x nginx.sh
+chmod +x ssl.sh
 chmod +x swap.sh
 chmod +x check_update.sh
 chmod +x docker.sh
@@ -46,7 +46,7 @@ echo "1. Full setup"
 echo "2. Update"
 echo "3. Install"
 echo "4. Setup"
-echo "5. Nginx"
+echo "5. SSL"
 echo "6. Run Docker"
 echo "7. Restart Docker"
 echo "8. View Docker logs"
@@ -75,7 +75,7 @@ case $choice in
     run_script "setup.sh"
     ;;
 5)
-    run_script "nginx.sh"
+    run_script "ssl.sh"
     ;;
 6)
     run_script "docker.sh"
@@ -93,13 +93,13 @@ case $choice in
     docker update --restart=no $DOCKER_PROCESS_NAME
     ;;
 11)
-    sudo crontab -l | grep -v "/usr/bin/certbot renew --quiet" | sudo crontab -
+    remove_cron_job $CRON_JOB_CERTBOT
     ;;
 12)
     configure_swap_space
     ;;
 13)
-    sudo crontab -l | grep -v "$(pwd)/check_update.sh" | sudo crontab -
+    remove_cron_job $CRON_JOB_UPDATE
     ;;
 *)
     echo "Invalid choice. Exiting..."

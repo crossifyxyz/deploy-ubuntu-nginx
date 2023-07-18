@@ -3,14 +3,39 @@
 # Load environment variables from .env file
 export $(grep -v '^#' .env | xargs)
 
+# Source utils.sh
+source ./utils.sh
+
 sudo killall nginx
 
 # Path to the default server configuration file
 DEFAULT_SERVER_CONF="/etc/nginx/sites-available/default"
 BACKUP_FILE="${DEFAULT_SERVER_CONF}.BAK"
 
-# Check if in test mode
+# Run the Certbot dry run and actual run if not in test mode
+ssl_success=false
+
 if [[ "$TEST_MODE" != "true" ]]; then
+    # Certbot dry run and actual run if successful
+    first_domain=$(echo "$DOMAINS" | awk '{print $1}')
+    if [ -d "/etc/letsencrypt/live/$first_domain" ]; then
+        echo "Certbot certificate already exists for $first_domain"
+    else
+        echo "Certbot certificate not found for $first_domain! Running dry run..."
+        sudo certbot certonly --dry-run -d $DOMAINS --email $EMAIL --agree-tos --no-eff-email --standalone
+        if [ $? -eq 0 ]; then
+            echo "Dry run successful for $DOMAINS! Running certbot..."
+            sudo certbot --nginx -d $DOMAINS --email $EMAIL --agree-tos --no-eff-email
+            ssl_success=true
+        else
+            echo "Dry run failed for $DOMAINS!"
+        fi
+    fi
+else
+    echo "Skipping Certbot dry run and actual run in test mode"
+fi
+
+run_nginx_setup() {
     # Backup the existing default server configuration file
     if [ ! -f "$BACKUP_FILE" ]; then
         sudo cp $DEFAULT_SERVER_CONF $BACKUP_FILE
@@ -40,6 +65,14 @@ if [[ "$TEST_MODE" != "true" ]]; then
     sudo systemctl restart nginx
 
     echo "Nginx configuration updated!"
+}
+
+# if Certbot run was successful, run long lasting funcs
+if [[ "$ssl_success" == "true" ]]; then
+    # Run nginx setup
+    run_nginx_setup
+    # Add a cron job to auto renew the Certbot certificate if not already added
+    add_cron_job $CRON_JOB_CERTBOT
 else
-    echo "Skipping Nginx configuration update in test mode"
+    echo "Skipping NGINX Setup and Certbot renew cron job"
 fi
