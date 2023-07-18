@@ -6,8 +6,6 @@ export $(grep -v '^#' .env | xargs)
 # Source utils.sh
 source ./utils.sh
 
-sudo killall nginx
-
 # Path to the default server configuration file
 DEFAULT_SERVER_CONF="/etc/nginx/sites-available/default"
 BACKUP_FILE="${DEFAULT_SERVER_CONF}.BAK"
@@ -35,6 +33,7 @@ else
 fi
 
 run_nginx_setup() {
+    sudo killall nginx
     # Backup the existing default server configuration file
     if [ ! -f "$BACKUP_FILE" ]; then
         sudo cp $DEFAULT_SERVER_CONF $BACKUP_FILE

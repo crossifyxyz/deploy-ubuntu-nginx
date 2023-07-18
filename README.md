@@ -29,13 +29,6 @@ chmod +x run.sh
 6. Run the run script:
 ./run.sh
 
-## Updating
-
-1. Run the update script:
-./update.sh
-
-2. The update script will pull the latest Docker image, stop and delete the old PM2 process, and start a new PM2 process with the latest Docker image.
-
 ## Usage
 
 - The server environment can be started, stopped, and managed using ./run.sh

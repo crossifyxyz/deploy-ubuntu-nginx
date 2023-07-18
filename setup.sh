@@ -22,35 +22,12 @@ else
     fi
 fi
 
-# Authenticate Docker to AWS ECR
-aws ecr get-login-password | docker login --username AWS --password-stdin $ECR_URI
-
-# Check if the image is already pulled
-if docker image inspect $ECR_URI &>/dev/null; then
-    read -p "The Docker image is already pulled. Do you want to pull it again? (y/n): " pull_again
-    if [[ $pull_again == "y" ]]; then
-        # Pull the latest image from AWS ECR
-        docker pull $ECR_URI
-    fi
-else
-    # Pull the latest image from AWS ECR
-    docker pull $ECR_URI
-fi
+# Run the Docker
+run_script "docker.sh"
 
 # Run SSL
 run_script "ssl.sh"
 
-# Run the Docker
-run_script "docker.sh"
-
-# Run Docker consist if not in test mode
-if [[ "$TEST_MODE" == "false" ]]; then
-    # Configure Docker to start the container on system startup
-    echo "Configuring Docker container to run on startup..."
-    docker update --restart=unless-stopped $DOCKER_PROCESS_NAME
-else
-    echo "Skipping Docker container to run on startup in test mode"
-fi
 
 # Add a cron job to check for updates every 30 minutes
 if [[ "$TEST_MODE" != "true" ]]; then

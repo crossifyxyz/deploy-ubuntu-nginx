@@ -26,17 +26,11 @@ if docker image inspect ${ECR_URI} &>/dev/null; then
     # Compare versions
     if [[ "$local_version" -lt "$remote_version" ]]; then
         echo "Local version ($local_version) is older than remote version ($remote_version). Pulling the new image..."
-
-        # Pull the latest image from AWS ECR
-        docker pull $ECR_URI
-
-        # Execute the update.sh script
-        run_script "$DIR_ARG/update.sh"
+        # Execute the docker.sh script
+        run_script "$DIR_ARG/docker.sh"
     else
         echo "Local version ($local_version) is up to date. No action required."
     fi
 else
-    echo "Docker image not found locally. Pulling the image from AWS ECR..."
-    # Pull the image from AWS ECR
-    docker pull $ECR_URI
+    echo "Docker image not found locally."
 fi

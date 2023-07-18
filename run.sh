@@ -26,7 +26,6 @@ source ./utils.sh
 # Make install.sh and setup.sh executable
 chmod +x install.sh
 chmod +x setup.sh
-chmod +x update.sh
 chmod +x ssl.sh
 chmod +x swap.sh
 chmod +x check_update.sh
@@ -38,6 +37,13 @@ configure_swap_space() {
     if [[ $configure_swap == "y" ]]; then
         run_script "swap.sh"
     fi
+}
+
+# Function to remove all cron jobs
+remove_all_cron_jobs() {
+    echo "Removing all cron jobs..."
+    sudo crontab -r
+    echo "All cron jobs removed."
 }
 
 # Prompt for user input
@@ -55,8 +61,9 @@ echo "10. Disable Docker on startup"
 echo "11. Cancel Certbot cron job"
 echo "12. Configure Swap Space"
 echo "13. Cancel Docker check update cron job"
+echo "14. Kill all cron jobs"
 
-read -p "Enter your choice (1-13): " choice
+read -p "Enter your choice (1-14): " choice
 
 # Execute the selected option
 case $choice in
@@ -64,9 +71,6 @@ case $choice in
     configure_swap_space
     run_script "install.sh"
     run_script "setup.sh"
-    ;;
-2)
-    run_script "update.sh"
     ;;
 3)
     run_script "install.sh"
@@ -100,6 +104,9 @@ case $choice in
     ;;
 13)
     remove_cron_job $CRON_JOB_UPDATE
+    ;;
+14)
+    remove_all_cron_jobs
     ;;
 *)
     echo "Invalid choice. Exiting..."
