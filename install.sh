@@ -1,7 +1,5 @@
 #!/bin/bash
 
-source $HOME/.bashrc
-
 # Load environment variables from .env file
 export $(grep -v '^#' .env | xargs)
 
@@ -24,6 +22,12 @@ fi
 # Install NODE if not present
 if ! command -v node &>/dev/null; then
     echo "NODE not found! Installing..."
+
+    # Load nvm
+    export NVM_DIR="$HOME/.nvm"
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"                   # This loads nvm
+    [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" # This loads nvm bash_completion
+
     nvm install --lts
 else
     echo "NODE is already installed"
