@@ -48,6 +48,7 @@ fi
 if [[ "$TEST_MODE" != "true" ]] && ! command -v nginx &>/dev/null; then
     echo "Nginx not found! Installing..."
     sudo apt install -y nginx
+    sudo killall nginx
 else
     echo "Nginx is already installed"
 fi

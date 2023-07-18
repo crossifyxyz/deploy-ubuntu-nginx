@@ -3,6 +3,8 @@
 # Load environment variables from .env file
 export $(grep -v '^#' .env | xargs)
 
+sudo killall nginx
+
 # Path to the default server configuration file
 DEFAULT_SERVER_CONF="/etc/nginx/sites-available/default"
 BACKUP_FILE="${DEFAULT_SERVER_CONF}.BAK"
