@@ -1,5 +1,7 @@
 #!/bin/bash
 
+source $HOME/.bashrc
+
 # Load environment variables from .env file
 export $(grep -v '^#' .env | xargs)
 
@@ -15,7 +17,6 @@ fi
 if ! [ -d "${HOME}/.nvm/.git" ]; then
     echo "NVM not found! Installing..."
     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
-    source $HOME/.bashrc
 else
     echo "NVM is already installed"
 fi
