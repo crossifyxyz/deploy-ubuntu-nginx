@@ -3,9 +3,13 @@
 # Load environment variables from .env file
 export $(grep -v '^#' .env | xargs)
 
-# Update the system
-echo "Updating the System"
-sudo apt update
+# Prompt to update
+read -p "Do you want to update the system? (y/n): " update_conf
+if [[ $update_conf == "y" ]]; then
+    # Update the system
+    echo "Updating the System"
+    sudo apt update
+fi
 
 # Install NVM if not present
 if ! [ -d "${HOME}/.nvm/.git" ]; then
