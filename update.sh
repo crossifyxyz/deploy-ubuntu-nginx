@@ -13,5 +13,3 @@ docker pull $ECR_URI
 # Restart the Docker container with the new image using zero-downtime
 echo "Restarting Docker container"
 docker restart $DOCKER_PROCESS_NAME
-
-echo "Update completed!"

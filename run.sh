@@ -17,21 +17,17 @@ fi
 # Load environment variables from .env file
 export $(grep -v '^#' .env | xargs)
 
+# Source utils.sh
+source ./utils.sh
+
 # Make install.sh and setup.sh executable
 chmod +x install.sh
 chmod +x setup.sh
 chmod +x update.sh
 chmod +x nginx.sh
 chmod +x swap.sh
-
-# Function to run a script
-run_script() {
-    script=$1
-
-    echo "Running $script..."
-    bash $script
-    echo "$script completed."
-}
+chmod +x check_update.sh
+chmod +x docker.sh
 
 # Function to configure swap space
 configure_swap_space() {
@@ -55,53 +51,57 @@ echo "9. Kill all Docker"
 echo "10. Disable Docker on startup"
 echo "11. Cancel Certbot cron job"
 echo "12. Configure Swap Space"
+echo "13. Cancel Docker check update cron job"
 
-read -p "Enter your choice (1-12): " choice
+read -p "Enter your choice (1-13): " choice
 
 # Execute the selected option
 case $choice in
-    1)
-        configure_swap_space
-        run_script "install.sh"
-        run_script "setup.sh"
-        ;;
-    2)
-        run_script "update.sh"
-        ;;
-    3)
-        run_script "install.sh"
-        ;;
-    4)
-        run_script "setup.sh"
-        ;;
-    5)
-        run_script "nginx.sh"
-        ;;
-    6)
-        docker run -d -p $DEPLOY_PORT:$DEPLOY_PORT --env-file $(pwd)/.env.docker --name $DOCKER_PROCESS_NAME $ECR_URI
-        ;;
-    7)
-        docker restart $DOCKER_PROCESS_NAME
-        ;;
-    8)
-        docker logs $DOCKER_PROCESS_NAME
-        ;;
-    9)
-        docker rm -f $(docker ps -aq)
-        ;;
-    10)
-        docker update --restart=no $DOCKER_PROCESS_NAME
-        ;;
-    11)
-        sudo crontab -l | grep -v "/usr/bin/certbot renew --quiet" | sudo crontab -
-        ;;
-    12)
-        configure_swap_space
-        ;;
-    *)
-        echo "Invalid choice. Exiting..."
-        exit 1
-        ;;
+1)
+    configure_swap_space
+    run_script "install.sh"
+    run_script "setup.sh"
+    ;;
+2)
+    run_script "update.sh"
+    ;;
+3)
+    run_script "install.sh"
+    ;;
+4)
+    run_script "setup.sh"
+    ;;
+5)
+    run_script "nginx.sh"
+    ;;
+6)
+    run_script "docker.sh"
+    ;;
+7)
+    docker restart $DOCKER_PROCESS_NAME
+    ;;
+8)
+    docker logs --follow $DOCKER_PROCESS_NAME
+    ;;
+9)
+    docker rm -f $(docker ps -aq)
+    ;;
+10)
+    docker update --restart=no $DOCKER_PROCESS_NAME
+    ;;
+11)
+    sudo crontab -l | grep -v "/usr/bin/certbot renew --quiet" | sudo crontab -
+    ;;
+12)
+    configure_swap_space
+    ;;
+13)
+    sudo crontab -l | grep -v "$(pwd)/check_update.sh" | sudo crontab -
+    ;;
+*)
+    echo "Invalid choice. Exiting..."
+    exit 1
+    ;;
 esac
 
 # Finish the terminal prompts

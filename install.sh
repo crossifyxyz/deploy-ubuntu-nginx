@@ -87,5 +87,3 @@ if ! command -v pm2 &>/dev/null; then
 else
     echo "PM2 is already installed"
 fi
-
-echo "Installation Finalized!"

@@ -1,7 +1,13 @@
 #!/bin/bash
 
+# Get the current directory path
+CURRENT_DIR=$(dirname "$(readlink -f "$0")")
+
 # Load environment variables from .env file
 export $(grep -v '^#' .env | xargs)
+
+# Source utils.sh
+source ./utils.sh
 
 # Check if AWS credentials are already configured
 if ! aws configure get aws_access_key_id &>/dev/null && ! aws configure get aws_secret_access_key &>/dev/null; then
@@ -57,13 +63,9 @@ else
     certbot_failed=true
 fi
 
-# Run the Docker container if not already running
-if docker ps --filter "name=$DOCKER_PROCESS_NAME" --format '{{.Names}}' | grep -q "$DOCKER_PROCESS_NAME"; then
-    echo "Docker container is already running"
-else
-    echo "Docker container not found! Starting..."
-    docker run -d -p $DEPLOY_PORT:$DEPLOY_PORT --env-file $(pwd)/.env.docker --name $DOCKER_PROCESS_NAME $ECR_URI
-fi
+# Run the Docker
+run_script "docker.sh"
+
 
 # Run Docker consist if not in test mode
 if [[ "$TEST_MODE" == "false" ]]; then
@@ -74,20 +76,21 @@ else
     echo "Skipping Docker container to run on startup in test mode"
 fi
 
-if [[ "$certbot_failed" != "true" ]]; then
-    # Run nginx.sh
-    echo "Running nginx.sh..."
-    bash nginx.sh
-    echo "nginx.sh completed."
-    # Add a cron job to auto renew the Certbot certificate if not already added
-    CRON_JOB="0 12 * * * /usr/bin/certbot renew --quiet"
-    if ! crontab -l | grep -q "$CRON_JOB"; then
-        echo "$CRON_JOB" | sudo tee -a /var/spool/cron/crontabs/root
-    else
-        echo "Cron job already added"
-    fi
+# Add a cron job to check for updates every 30 minutes
+if [[ "$TEST_MODE" != "true" ]]; then
+    CRON_JOB_UPDATE="*/30 * * * * $CURRENT_DIR/check_update.sh $CURRENT_DIR"
+    add_cron_job "$CRON_JOB_UPDATE"
 else
-    echo "Skipping cron job and NGINX Setup in test mode or when Certbot run failed"
+    echo "Skipping check update cron job in test mode"
 fi
 
-echo "Setup finalized!"
+# if Certbot run was successful, run long lasting funcs
+if [[ "$certbot_failed" != "true" ]]; then
+    # Run nginx.sh
+    run_script "nginx.sh"
+    # Add a cron job to auto renew the Certbot certificate if not already added
+    CRON_JOB_CERTBOT="0 12 * * * /usr/bin/certbot renew --quiet"
+    add_cron_job "$CRON_JOB_CERTBOT"
+else
+    echo "Skipping NGINX Setup and Certbot renew cron job"
+fi
