@@ -1,5 +1,19 @@
 #!/bin/bash
 
+# Check if .env file exists
+if [ ! -f ".env" ]; then
+    echo ".env file not found!"
+    echo "Please make sure to create the .env file with the required environment variables."
+    exit 1
+fi
+
+# Check if .env.docker file exists
+if [ ! -f ".env.docker" ]; then
+    echo ".env.docker file not found!"
+    echo "Please make sure to create the .env.docker file with the required environment variables."
+    exit 1
+fi
+
 # Load environment variables from .env file
 export $(grep -v '^#' .env | xargs)
 
