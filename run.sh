@@ -1,5 +1,8 @@
 #!/bin/bash
 
+exec > >(tee -ia cli.log)
+exec 2> >(tee -ia cli.log >&2)
+
 # Check if .env file exists
 if [ ! -f ".env" ]; then
     echo ".env file not found!"
