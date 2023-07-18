@@ -31,7 +31,7 @@ run_script "ssl.sh"
 
 # Add a cron job to check for updates every 30 minutes
 if [[ "$TEST_MODE" != "true" ]]; then
-    add_cron_job $CRON_JOB_UPDATE
+    add_cron_job "*/30 * * * * $CURRENT_DIR/check_update.sh $CURRENT_DIR"
 else
     echo "Skipping check update cron job in test mode"
 fi

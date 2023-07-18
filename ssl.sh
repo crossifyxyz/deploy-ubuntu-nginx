@@ -69,7 +69,7 @@ if [[ "$ssl_success" == "true" ]]; then
     # Run nginx setup
     run_nginx_setup
     # Add a cron job to auto renew the Certbot certificate if not already added
-    add_cron_job $CRON_JOB_CERTBOT
+    add_cron_job "0 12 * * * /usr/bin/certbot renew --quiet --non-interactive"
 else
     echo "Skipping NGINX Setup and Certbot renew cron job"
 fi

@@ -96,14 +96,8 @@ case $choice in
 10)
     docker update --restart=no $DOCKER_PROCESS_NAME
     ;;
-11)
-    remove_cron_job $CRON_JOB_CERTBOT
-    ;;
 12)
     configure_swap_space
-    ;;
-13)
-    remove_cron_job $CRON_JOB_UPDATE
     ;;
 14)
     remove_all_cron_jobs

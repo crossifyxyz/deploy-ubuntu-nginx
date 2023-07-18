@@ -3,9 +3,6 @@
 # Get the current directory path
 CURRENT_DIR=$(dirname "$(readlink -f "$0")")
 
-CRON_JOB_UPDATE="*/30 * * * * $CURRENT_DIR/check_update.sh $CURRENT_DIR"
-CRON_JOB_CERTBOT="0 12 * * * /usr/bin/certbot renew --quiet --non-interactive"
-
 # Function to run a script
 run_script() {
     script=$1
