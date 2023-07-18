@@ -37,7 +37,9 @@ if ! command -v docker &>/dev/null; then
     sudo apt update
     apt-cache policy docker-ce
     sudo apt install docker-ce
+    sudo groupadd docker
     sudo usermod -aG docker ${USER}
+    newgrp docker
 else
     echo "Docker is already installed"
 fi

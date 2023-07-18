@@ -22,8 +22,17 @@ fi
 # Authenticate Docker to AWS ECR
 aws ecr get-login-password | docker login --username AWS --password-stdin $ECR_URI
 
-# Pull the latest image from AWS ECR
-docker pull $ECR_URI
+# Check if the image is already pulled
+if docker image ls | grep -q $ECR_URI; then
+    read -p "The Docker image is already pulled. Do you want to pull it again? (y/n): " pull_again
+    if [[ $pull_again == "y" ]]; then
+        # Pull the latest image from AWS ECR
+        docker pull $ECR_URI
+    fi
+else
+    # Pull the latest image from AWS ECR
+    docker pull $ECR_URI
+fi
 
 # Run the Certbot dry run and actual run if not in test mode
 certbot_failed=false
@@ -34,7 +43,7 @@ if [[ "$TEST_MODE" != "true" ]]; then
         echo "Certbot certificate already exists for $first_domain"
     else
         echo "Certbot certificate not found for $first_domain! Running dry run..."
-        sudo certbot certonly --dry-run -d $DOMAINS --email $EMAIL --agree-tos --no-eff-email --standalone
+        sudo certbot certonly --dry-run -d $DOMAINS --email $EMAIL --agree-tos --no-eff-email
         if [ $? -eq 0 ]; then
             echo "Dry run successful for $DOMAINS! Running certbot..."
             sudo certbot --nginx -d $DOMAINS --email $EMAIL --agree-tos --no-eff-email
