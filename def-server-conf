@@ -22,11 +22,11 @@ server {
 root /var/www/html;
 
 index index.html index.htm index.nginx-debian.html;
-server_name dev-api.crossify.xyz;
+server_name server_name_placeholder;
 
 
 location / {
-    proxy_pass http://localhost:8080;
+    proxy_pass proxy_pass_placeholder;
     proxy_set_header Upgrade $http_upgrade;
     proxy_set_header Connection 'upgrade';
     proxy_set_header Host $host;
@@ -38,20 +38,20 @@ location / {
 
     listen [::]:443 ssl ipv6only=on;
     listen 443 ssl;
-    ssl_certificate /etc/letsencrypt/live/dev-api.crossify.xyz/fullchain.pem; # managed by Certbot
-    ssl_certificate_key /etc/letsencrypt/live/dev-api.crossify.xyz/privkey.pem; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/first_domain_placeholder/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/first_domain_placeholder/privkey.pem; # managed by Certbot
     include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
     ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
 
 }
 server {
-    if ($host = dev-api.crossify.xyz) {
+    if ($host = server_name_switch_placeholder) {
         return 301 https://$host$request_uri;
     } # managed by Certbot
 
 
 listen 80 ;
 listen [::]:80 ;
-    server_name dev-api.crossify.xyz;
+    server_name server_name_placeholder;
     return 404; # managed by Certbot
 }
