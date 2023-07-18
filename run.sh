@@ -58,10 +58,8 @@ echo "7. Restart Docker"
 echo "8. View Docker logs"
 echo "9. Kill all Docker"
 echo "10. Disable Docker on startup"
-echo "11. Cancel Certbot cron job"
-echo "12. Configure Swap Space"
-echo "13. Cancel Docker check update cron job"
-echo "14. Kill all cron jobs"
+echo "11. Configure Swap Space"
+echo "12. Kill all cron jobs"
 
 read -p "Enter your choice (1-14): " choice
 
@@ -96,10 +94,10 @@ case $choice in
 10)
     docker update --restart=no $DOCKER_PROCESS_NAME
     ;;
-12)
+11)
     configure_swap_space
     ;;
-14)
+12)
     remove_all_cron_jobs
     ;;
 *)
