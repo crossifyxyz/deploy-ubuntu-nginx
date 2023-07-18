@@ -60,7 +60,6 @@ run_nginx_setup() {
     rm def-server-conf-temp
 
     # Restart Nginx to apply the changes
-    sudo systemctl restart nginx
 
     echo "Nginx configuration updated!"
 }
@@ -74,3 +73,5 @@ if [[ "$ssl_success" == "true" ]]; then
 else
     echo "Skipping NGINX Setup and Certbot renew cron job"
 fi
+
+sudo systemctl restart nginx

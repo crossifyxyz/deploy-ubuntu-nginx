@@ -33,4 +33,5 @@ if docker image inspect ${ECR_URI} &>/dev/null; then
     fi
 else
     echo "Docker image not found locally."
+    run_script "$DIR_ARG/docker.sh"
 fi
