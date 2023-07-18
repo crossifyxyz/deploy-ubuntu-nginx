@@ -22,7 +22,7 @@ fi
 # Install NODE if not present
 if ! command -v node &>/dev/null; then
     echo "NODE not found! Installing..."
-
+    
     # Load nvm
     export NVM_DIR="$HOME/.nvm"
     [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"                   # This loads nvm
@@ -88,7 +88,7 @@ fi
 # Install PM2 if not present
 if ! command -v pm2 &>/dev/null; then
     echo "PM2 not found! Installing..."
-    sudo npm install -g pm2
+    npm install -g pm2
 else
     echo "PM2 is already installed"
 fi
