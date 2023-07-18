@@ -17,6 +17,8 @@ if [[ "$TEST_MODE" != "true" ]]; then
     # Certbot dry run and actual run if successful
     if sudo certbot certificates | grep -q "Domains: $DOMAINS"; then
         echo "Certbot certificate already exists for Domains: $DOMAINS"
+        # Add a cron job to auto renew the Certbot certificate if not already added
+        add_cron_job "0 12 * * * /usr/bin/certbot renew --quiet --non-interactive"
     else
         echo "Certbot certificate not found for Domains: $DOMAINS! Running dry run..."
         sudo certbot certonly --dry-run -d $DOMAINS --email $EMAIL --agree-tos --no-eff-email --standalone
@@ -68,8 +70,6 @@ run_nginx_setup() {
 if [[ "$ssl_success" == "true" ]]; then
     # Run nginx setup
     run_nginx_setup
-    # Add a cron job to auto renew the Certbot certificate if not already added
-    add_cron_job "0 12 * * * /usr/bin/certbot renew --quiet --non-interactive"
 else
     echo "Skipping NGINX Setup and Certbot renew cron job"
 fi

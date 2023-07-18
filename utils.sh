@@ -19,7 +19,7 @@ run_script() {
 # Function to add a cron job
 add_cron_job() {
     cron_job=$1
-    if ! crontab -l | grep -q "$cron_job"; then
+    if ! sudo crontab -l | grep -q "$cron_job"; then
         echo "$cron_job" | sudo tee -a /var/spool/cron/crontabs/root
         echo "Cron job added: $cron_job"
     else
@@ -30,7 +30,7 @@ add_cron_job() {
 # Function to remove a cron job
 remove_cron_job() {
     cron_job=$1
-    if crontab -l | grep -q "$cron_job"; then
+    if sudo crontab -l | grep -q "$cron_job"; then
         sudo crontab -l | grep -v "$cron_job" | sudo crontab -
         echo "Cron job removed: $cron_job"
     else
