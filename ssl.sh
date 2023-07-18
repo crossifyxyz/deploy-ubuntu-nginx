@@ -17,11 +17,10 @@ ssl_success=false
 
 if [[ "$TEST_MODE" != "true" ]]; then
     # Certbot dry run and actual run if successful
-    first_domain=$(echo "$DOMAINS" | awk '{print $1}')
-    if [ -d "/etc/letsencrypt/live/$first_domain" ]; then
-        echo "Certbot certificate already exists for $first_domain"
+    if sudo certbot certificates | grep -q "Domains: $DOMAINS"; then
+        echo "Certbot certificate already exists for Domains: $DOMAINS"
     else
-        echo "Certbot certificate not found for $first_domain! Running dry run..."
+        echo "Certbot certificate not found for Domains: $DOMAINS! Running dry run..."
         sudo certbot certonly --dry-run -d $DOMAINS --email $EMAIL --agree-tos --no-eff-email --standalone
         if [ $? -eq 0 ]; then
             echo "Dry run successful for $DOMAINS! Running certbot..."

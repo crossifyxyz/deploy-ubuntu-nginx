@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# Get the current directory path
-CURRENT_DIR=$(dirname "$(readlink -f "$0")")
-
 # Load environment variables from .env file
 export $(grep -v '^#' .env | xargs)
 
