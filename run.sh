@@ -28,7 +28,6 @@ chmod +x install.sh
 chmod +x setup.sh
 chmod +x ssl.sh
 chmod +x swap.sh
-chmod +x check_update.sh
 chmod +x docker.sh
 
 # Function to configure swap space

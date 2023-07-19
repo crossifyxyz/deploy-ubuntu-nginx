@@ -9,6 +9,7 @@ source ./utils.sh
 # Path to the default server configuration file
 DEFAULT_SERVER_CONF="/etc/nginx/sites-available/default"
 BACKUP_FILE="${DEFAULT_SERVER_CONF}.BAK"
+CRONJOB_RENEW="0 12 * * * /usr/bin/certbot renew --quiet --non-interactive"
 
 # Run the Certbot dry run and actual run if not in test mode
 ssl_success=false
@@ -18,7 +19,7 @@ if [[ "$TEST_MODE" != "true" ]]; then
     if sudo certbot certificates | grep -q "Domains: $DOMAINS"; then
         echo "Certbot certificate already exists for Domains: $DOMAINS"
         # Add a cron job to auto renew the Certbot certificate if not already added
-        add_cron_job "0 12 * * * /usr/bin/certbot renew --quiet --non-interactive"
+        add_cron_job $CRONJOB_RENEW
     else
         echo "Certbot certificate not found for Domains: $DOMAINS! Running dry run..."
         sudo certbot certonly --dry-run -d $DOMAINS --email $EMAIL --agree-tos --no-eff-email --standalone
