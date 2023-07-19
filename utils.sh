@@ -34,7 +34,6 @@ add_cron_job() {
     fi
 }
 
-
 # Function to remove a cron job
 remove_cron_job() {
     cron_job=$1
@@ -61,6 +60,15 @@ run_docker_container() {
 restart_docker_container() {
     echo "Removing old Docker container..."
     docker rm -f $DOCKER_PROCESS_NAME
+    run_docker_container
+}
+
+update_docker_container() {
+    echo "Removing old Docker container..."
+    docker rm -f $DOCKER_PROCESS_NAME
+    auth_aws
+    echo "Pulling latest image from AWS ECR..."
+    docker pull $ECR_URI
     run_docker_container
 }
 

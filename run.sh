@@ -70,6 +70,9 @@ case $choice in
     run_script "install.sh"
     run_script "setup.sh"
     ;;
+2)
+    update_docker_container
+    ;;
 3)
     run_script "install.sh"
     ;;

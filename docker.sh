@@ -21,12 +21,7 @@ if docker ps -a --filter "name=$DOCKER_PROCESS_NAME" --format '{{.Names}}' | gre
     # Compare versions
     if [[ "$local_version" -lt "$remote_version" ]]; then
         echo "Local version ($local_version) is older than remote version ($remote_version). Pulling the new image..."
-        echo "Removing old Docker container..."
-        docker rm -f $DOCKER_PROCESS_NAME
-        auth_aws
-        echo "Pulling latest image from AWS ECR..."
-        docker pull $ECR_URI
-        run_docker_container
+        update_docker_container
     else
         echo "Local version ($local_version) is up to date. No action required."
     fi
