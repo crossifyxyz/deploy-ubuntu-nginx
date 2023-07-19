@@ -22,11 +22,15 @@ run_script() {
 # Function to add a cron job
 add_cron_job() {
     cron_job=$1
-    if ! sudo crontab -l | grep -q "$cron_job"; then
-        echo "$cron_job" | sudo tee -a /var/spool/cron/crontabs/root
-        echo "Cron job added: $cron_job"
+    if [[ "$TEST_MODE" != "true" ]]; then
+        if ! sudo crontab -l | grep -Fxq "$cron_job"; then
+            (sudo crontab -l; echo "$cron_job") | sudo crontab -
+            echo "Cron job added: $cron_job"
+        else
+            echo "Cron job already exists: $cron_job"
+        fi
     else
-        echo "Cron job already exists: $cron_job"
+        echo "Skipping cron job in test mode"
     fi
 }
 
@@ -57,4 +61,14 @@ restart_docker_container() {
     echo "Removing old Docker container..."
     docker rm -f $DOCKER_PROCESS_NAME
     run_docker_container
+}
+
+add_cron_job_renew() {
+    CRONJOB_RENEW="0 12 * * * /usr/bin/certbot renew --quiet --non-interactive"
+    add_cron_job $CRONJOB_RENEW
+}
+
+add_cron_job_update() {
+    CRONJOB_UPDATE="*/30 * * * * $CURRENT_DIR/docker.sh"
+    add_cron_job $CRONJOB_UPDATE
 }

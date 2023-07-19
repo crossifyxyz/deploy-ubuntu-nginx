@@ -58,7 +58,8 @@ echo "8. View Docker logs"
 echo "9. Kill all Docker"
 echo "10. Disable Docker on startup"
 echo "11. Configure Swap Space"
-echo "12. Kill all cron jobs"
+echo "12. Add all cron jobs"
+echo "13. Kill all cron jobs"
 
 read -p "Enter your choice (1-14): " choice
 
@@ -85,7 +86,7 @@ case $choice in
     restart_docker_container
     ;;
 8)
-    docker logs --follow $DOCKER_PROCESS_NAME
+    docker logs $DOCKER_PROCESS_NAME
     ;;
 9)
     docker rm -f $(docker ps -aq)
@@ -97,6 +98,10 @@ case $choice in
     configure_swap_space
     ;;
 12)
+    add_cron_job_renew
+    add_cron_job_update
+    ;;
+13)
     remove_all_cron_jobs
     ;;
 *)

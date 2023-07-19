@@ -6,8 +6,6 @@ export $(grep -v '^#' .env | xargs)
 # Source utils.sh
 source ./utils.sh
 
-CRONJOB_UPDATE="*/30 * * * * $CURRENT_DIR/docker.sh"
-
 # Check if AWS credentials are already configured
 if ! aws configure get aws_access_key_id &>/dev/null && ! aws configure get aws_secret_access_key &>/dev/null; then
     # AWS credentials not configured, run aws configure
@@ -29,11 +27,3 @@ run_script "docker.sh"
 
 # Run SSL
 run_script "ssl.sh"
-
-
-# Add a cron job to check for updates every 30 minutes
-if [[ "$TEST_MODE" != "true" ]]; then
-    add_cron_job $CRONJOB_UPDATE
-else
-    echo "Skipping check update cron job in test mode"
-fi

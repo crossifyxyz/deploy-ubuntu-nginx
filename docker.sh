@@ -43,3 +43,6 @@ else
         run_docker_container
     fi
 fi
+
+# Add a cron job to check for updates every 30 minutes
+add_cron_job_update
