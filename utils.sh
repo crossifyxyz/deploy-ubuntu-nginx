@@ -34,6 +34,18 @@ add_cron_job() {
     fi
 }
 
+
+# Function to remove a cron job
+remove_cron_job() {
+    cron_job=$1
+    if sudo crontab -l | grep -q "$cron_job"; then
+        sudo crontab -l | grep -v "$cron_job" | sudo crontab -
+        echo "Cron job removed: $cron_job"
+    else
+        echo "Cron job does not exist: $cron_job"
+    fi
+}
+
 # Authenticate Docker to AWS ECR
 auth_aws() {
     aws ecr get-login-password | docker login --username AWS --password-stdin $ECR_URI
@@ -54,10 +66,10 @@ restart_docker_container() {
 
 add_cron_job_renew() {
     CRONJOB_RENEW="0 12 * * * /usr/bin/certbot renew --quiet --non-interactive"
-    add_cron_job $CRONJOB_RENEW
+    add_cron_job "$CRONJOB_RENEW"
 }
 
 add_cron_job_update() {
     CRONJOB_UPDATE="*/30 * * * * $CURRENT_DIR/docker.sh"
-    add_cron_job $CRONJOB_UPDATE
+    add_cron_job "$CRONJOB_UPDATE"
 }
