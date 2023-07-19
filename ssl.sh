@@ -21,6 +21,7 @@ if [[ "$TEST_MODE" != "true" ]]; then
         # Add a cron job to auto renew the Certbot certificate if not already added
         add_cron_job $CRONJOB_RENEW
     else
+        sudo killall nginx
         echo "Certbot certificate not found for Domains: $DOMAINS! Running dry run..."
         sudo certbot certonly --dry-run -d $DOMAINS --email $EMAIL --agree-tos --no-eff-email --standalone
         if [ $? -eq 0 ]; then

@@ -82,7 +82,7 @@ case $choice in
     run_script "docker.sh"
     ;;
 7)
-    docker restart $DOCKER_PROCESS_NAME
+    restart_docker_container
     ;;
 8)
     docker logs --follow $DOCKER_PROCESS_NAME

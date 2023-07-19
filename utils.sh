@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Load environment variables from .env file
+export $(grep -v '^#' .env | xargs)
+
 # Get the current directory path
 CURRENT_DIR=$(dirname "$(readlink -f "$0")")
 
@@ -36,4 +39,22 @@ remove_cron_job() {
     else
         echo "Cron job does not exist: $cron_job"
     fi
+}
+
+# Authenticate Docker to AWS ECR
+auth_aws() {
+    aws ecr get-login-password | docker login --username AWS --password-stdin $ECR_URI
+}
+
+# Run the Docker container
+run_docker_container() {
+    echo "Starting Docker container..."
+    docker run -d -p $DEPLOY_PORT:$DEPLOY_PORT --env-file "$CURRENT_DIR/.env.docker" --name $DOCKER_PROCESS_NAME $ECR_URI
+    docker update --restart=unless-stopped $DOCKER_PROCESS_NAME
+}
+
+restart_docker_container() {
+    echo "Removing old Docker container..."
+    docker rm -f $DOCKER_PROCESS_NAME
+    run_docker_container
 }
