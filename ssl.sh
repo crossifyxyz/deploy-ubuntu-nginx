@@ -11,8 +11,14 @@ DEFAULT_SERVER_CONF="/etc/nginx/sites-available/default"
 BACKUP_FILE="${DEFAULT_SERVER_CONF}.BAK"
 CRONJOB_RENEW="0 12 * * * /usr/bin/certbot renew --quiet --non-interactive"
 
-# Run the Certbot dry run and actual run if not in test mode
+# Get nginx server names
+get_nginx_domains() {
+    sudo nginx -T | grep server_name | awk '{print $2}' | tr -d ';'
+}
+
+# Certbot dry run and actual run if not in test mode
 ssl_success=false
+nginx_setup_needed=false
 
 if [[ "$TEST_MODE" != "true" ]]; then
     # Certbot dry run and actual run if successful
@@ -68,8 +74,14 @@ run_nginx_setup() {
     echo "Nginx configuration updated!"
 }
 
-# if Certbot run was successful, run long lasting funcs
-if [[ "$ssl_success" == "true" ]]; then
+# if Nginx domains are different from .env domains, setup needed
+nginx_domains=$(get_nginx_domains)
+if [[ "$nginx_domains" != "$DOMAINS" ]]; then
+    nginx_setup_needed=true
+fi
+
+# if Certbot run was successful or Nginx setup needed, run long lasting funcs
+if [[ "$ssl_success" == "true" ]] || [[ "$nginx_setup_needed" == "true" ]]; then
     # Run nginx setup
     run_nginx_setup
 else
