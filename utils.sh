@@ -24,7 +24,7 @@ add_cron_job() {
     cron_job=$1
     if [[ "$TEST_MODE" != "true" ]]; then
         if ! sudo crontab -l | grep -Fxq "$cron_job"; then
-            (sudo crontab -l; echo "$cron_job") | sudo crontab -
+            echo "$cron_job" | sudo tee -a /var/spool/cron/crontabs/root
             echo "Cron job added: $cron_job"
         else
             echo "Cron job already exists: $cron_job"
