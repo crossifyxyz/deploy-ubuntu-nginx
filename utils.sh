@@ -24,24 +24,13 @@ add_cron_job() {
     cron_job=$1
     if [[ "$TEST_MODE" != "true" ]]; then
         if ! sudo crontab -l | grep -Fxq "$cron_job"; then
-            echo "$cron_job" | sudo tee -a /var/spool/cron/crontabs/root
+            echo -e "$cron_job" | sudo tee -a /var/spool/cron/crontabs/root
             echo "Cron job added: $cron_job"
         else
             echo "Cron job already exists: $cron_job"
         fi
     else
         echo "Skipping cron job in test mode"
-    fi
-}
-
-# Function to remove a cron job
-remove_cron_job() {
-    cron_job=$1
-    if sudo crontab -l | grep -q "$cron_job"; then
-        sudo crontab -l | grep -v "$cron_job" | sudo crontab -
-        echo "Cron job removed: $cron_job"
-    else
-        echo "Cron job does not exist: $cron_job"
     fi
 }
 
