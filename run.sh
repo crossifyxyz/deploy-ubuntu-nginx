@@ -3,18 +3,25 @@
 exec > >(tee -ia cli.log)
 exec 2> >(tee -ia cli.log >&2)
 
+# Function to prompt the user to paste environment variables block and create the file
+prompt_and_create_env_file() {
+    file=$1
+
+    echo "$file file not found!"
+    echo "Please paste the block of environment variables code and press Enter:"
+    read -r -d '' env_block
+    echo "$env_block" > "$file"
+    echo "$file file created with the provided environment variables."
+}
+
 # Check if .env file exists
 if [ ! -f ".env" ]; then
-    echo ".env file not found!"
-    echo "Please make sure to create the .env file with the required environment variables."
-    exit 1
+    prompt_and_create_env_file ".env"
 fi
 
 # Check if .env.docker file exists
 if [ ! -f ".env.docker" ]; then
-    echo ".env.docker file not found!"
-    echo "Please make sure to create the .env.docker file with the required environment variables."
-    exit 1
+    prompt_and_create_env_file ".env.docker"
 fi
 
 # Load environment variables from .env file
@@ -29,6 +36,7 @@ chmod +x setup.sh
 chmod +x ssl.sh
 chmod +x swap.sh
 chmod +x docker.sh
+chmod +x utils.sh
 
 # Function to configure swap space
 configure_swap_space() {
